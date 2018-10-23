@@ -2,7 +2,6 @@ defmodule Membrane.Element.RawVideo.Parser do
   use Membrane.Element.Base.Filter
   alias Membrane.{Buffer, Payload}
   alias Membrane.Caps.Video.Raw
-  alias Membrane.Element.RawVideo.ParserHelper
 
   def_input_pads input: [
                    demand_unit: :bytes,
@@ -37,23 +36,36 @@ defmodule Membrane.Element.RawVideo.Parser do
                 spec: Raw.framerate_t(),
                 default: {0, 1},
                 description: """
-                Framerate of video stream. Passed down in cap.
+                Framerate of video stream. Passed down in caps.
                 """
               ]
 
   @impl true
   def handle_init(opts) do
-    with {:ok, frame_size} <- ParserHelper.get_frame_size(opts.format, opts.width, opts.height) do
-      {:ok, %{frame_size: frame_size, queue: <<>>}}
+    with {:ok, frame_size} <- Raw.frame_size(opts.format, opts.width, opts.height) do
+      caps = %Raw{
+        format: opts.format,
+        width: opts.width,
+        height: opts.height,
+        framerate: opts.framerate,
+        aligned: true
+      }
+
+      {:ok, %{caps: caps, frame_size: frame_size, queue: <<>>}}
     end
   end
 
   @impl true
-  def handle_demand(:input, bufs, :buffers, _, state) do
+  def handle_prepared_to_playing(_ctx, state) do
+    {{:ok, caps: {:output, state.caps}}, state}
+  end
+
+  @impl true
+  def handle_demand(:output, bufs, :buffers, _, state) do
     {{:ok, demand: {:input, bufs * state.frame_size}}, state}
   end
 
-  def handle_demand(:input, size, :bytes, _, state) do
+  def handle_demand(:output, size, :bytes, _, state) do
     {{:ok, demand: {:input, size}}, state}
   end
 
