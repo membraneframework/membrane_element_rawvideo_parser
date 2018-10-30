@@ -1,4 +1,12 @@
 defmodule Membrane.Element.RawVideo.Parser do
+  @moduledoc """
+  Simple module responsible for splitting the incoming buffers into
+  frames of raw (uncompressed) video frames of desired format.
+
+  The parser sends proper caps when moves to playing state.
+  No data analysis is done, this element simply ensures that 
+  the resulting packets have proper size.
+  """
   use Membrane.Element.Base.Filter
   alias Membrane.{Buffer, Payload}
   alias Membrane.Caps.Video.Raw
@@ -22,13 +30,13 @@ defmodule Membrane.Element.RawVideo.Parser do
               width: [
                 type: :int,
                 description: """
-                Width of a frame in pixels
+                Width of a frame in pixels.
                 """
               ],
               height: [
                 type: :int,
                 description: """
-                Height of a frame in pixels
+                Height of a frame in pixels.
                 """
               ],
               framerate: [
@@ -36,7 +44,7 @@ defmodule Membrane.Element.RawVideo.Parser do
                 spec: Raw.framerate_t(),
                 default: {0, 1},
                 description: """
-                Framerate of video stream. Passed down in caps.
+                Framerate of video stream. Passed forward in caps.
                 """
               ]
 
@@ -61,11 +69,11 @@ defmodule Membrane.Element.RawVideo.Parser do
   end
 
   @impl true
-  def handle_demand(:output, bufs, :buffers, _, state) do
+  def handle_demand(:output, bufs, :buffers, _ctx, state) do
     {{:ok, demand: {:input, bufs * state.frame_size}}, state}
   end
 
-  def handle_demand(:output, size, :bytes, _, state) do
+  def handle_demand(:output, size, :bytes, _ctx, state) do
     {{:ok, demand: {:input, size}}, state}
   end
 
@@ -90,7 +98,7 @@ defmodule Membrane.Element.RawVideo.Parser do
   end
 
   @impl true
-  def handle_prepared_to_stopped(_, state) do
+  def handle_prepared_to_stopped(_ctx, state) do
     {:ok, %{state | queue: <<>>}}
   end
 
