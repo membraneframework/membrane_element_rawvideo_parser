@@ -54,8 +54,7 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
     [
       {:ex_doc, "~> 0.19.0", only: :dev, runtime: false},
       {:membrane_core, github: "membraneframework/membrane-core"},
-      {:membrane_caps_video_raw,
-       github: "membraneframework/membrane-caps-video-raw", branch: "develop"},
+      {:membrane_caps_video_raw, github: "membraneframework/membrane-caps-video-raw"},
       {:membrane_element_file,
        github: "membraneframework/membrane-element-file",
        branch: "feature/release_v0.2",
