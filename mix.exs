@@ -45,8 +45,7 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
       links: %{
         "GitHub" => @github_url,
         "Membrane Framework Homepage" => "https://membraneframework.org"
-      },
-      files: ["lib", "mix.exs", "README*", "LICENSE*", ".formatter.exs", "bundlex.exs", "c_src"]
+      }
     ]
   end
 
