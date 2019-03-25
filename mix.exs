@@ -1,7 +1,7 @@
 defmodule Membrane.Element.RawVideo.Parser.MixProject do
   use Mix.Project
 
-  @version "0.1.0"
+  @version "0.1.1"
   @github_url "https://github.com/membraneframework/membrane-element-rawvideo-parser"
 
   def project do
@@ -52,9 +52,9 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
   defp deps do
     [
       {:ex_doc, "~> 0.19.0", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.2"},
-      {:membrane_caps_video_raw, "~> 0.1"},
-      {:membrane_element_file, "~> 0.2", only: :test}
+      {:membrane_core, "~> 0.3.0"},
+      {:membrane_caps_video_raw, "~> 0.1.0"},
+      {:membrane_element_file, "~> 0.2.3", only: :test}
     ]
   end
 end

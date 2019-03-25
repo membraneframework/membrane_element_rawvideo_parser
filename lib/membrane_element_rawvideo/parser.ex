@@ -4,21 +4,16 @@ defmodule Membrane.Element.RawVideo.Parser do
   frames of raw (uncompressed) video frames of desired format.
 
   The parser sends proper caps when moves to playing state.
-  No data analysis is done, this element simply ensures that 
+  No data analysis is done, this element simply ensures that
   the resulting packets have proper size.
   """
   use Membrane.Element.Base.Filter
   alias Membrane.{Buffer, Payload}
   alias Membrane.Caps.Video.Raw
 
-  def_input_pads input: [
-                   demand_unit: :bytes,
-                   caps: :any
-                 ]
+  def_input_pad :input, demand_unit: :bytes, caps: :any
 
-  def_output_pads output: [
-                    caps: {Raw, aligned: true}
-                  ]
+  def_output_pad :output, caps: {Raw, aligned: true}
 
   def_options format: [
                 type: :atom,
