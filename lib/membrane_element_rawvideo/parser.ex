@@ -7,7 +7,7 @@ defmodule Membrane.Element.RawVideo.Parser do
   No data analysis is done, this element simply ensures that
   the resulting packets have proper size.
   """
-  use Membrane.Element.Base.Filter
+  use Membrane.Filter
   alias Membrane.{Buffer, Payload}
   alias Membrane.Caps.Video.Raw
 
