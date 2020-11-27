@@ -53,8 +53,7 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
     [
       {:ex_doc, "~> 0.21", only: :dev, runtime: false},
       {:membrane_core, "~> 0.5.0"},
-      {:membrane_caps_video_raw, "~> 0.1.0"},
-      {:membrane_element_file, "~> 0.3.0", only: :test}
+      {:membrane_caps_video_raw, "~> 0.1.0"}
     ]
   end
 end
