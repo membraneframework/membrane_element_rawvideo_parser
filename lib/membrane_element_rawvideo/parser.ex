@@ -54,7 +54,7 @@ defmodule Membrane.Element.RawVideo.Parser do
         aligned: true
       }
 
-      {:ok, %{caps: caps, frame_size: frame_size, queue: <<>>}}
+      {:ok, %{caps: caps, timestamp: 0, frame_size: frame_size, queue: <<>>}}
     end
   end
 
@@ -88,6 +88,12 @@ defmodule Membrane.Element.RawVideo.Parser do
       {:ok, %{state | queue: payload}}
     else
       {bufs, tail} = split_into_buffers(payload, frame_size)
+
+      {bufs, state} =
+        Enum.map_reduce(bufs, state, fn buffer, state_acc ->
+          {%Buffer{buffer | metadata: %{pts: state_acc.timestamp}}, bump_timestamp(state_acc)}
+        end)
+
       {{:ok, buffer: {:output, bufs}}, %{state | queue: tail}}
     end
   end
@@ -95,6 +101,17 @@ defmodule Membrane.Element.RawVideo.Parser do
   @impl true
   def handle_prepared_to_stopped(_ctx, state) do
     {:ok, %{state | queue: <<>>}}
+  end
+
+  defp bump_timestamp(%{caps: %{framerate: {0, _}}} = state) do
+    state
+  end
+
+  defp bump_timestamp(state) do
+    use Ratio
+    %{timestamp: timestamp, caps: %{framerate: {num, denom}}} = state
+    timestamp = timestamp + Ratio.new(denom * Membrane.Time.second(), num)
+    %{state | timestamp: timestamp}
   end
 
   defp split_into_buffers(data, frame_size, acc \\ [])
