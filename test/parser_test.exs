@@ -48,15 +48,14 @@ defmodule Membrane.Element.RawVideo.ParserTest do
   end
 
   test "Process buffer with part of frame queued" do
+    assert parser_state =
+             Parser.handle_init(%Parser{format: :I420, width: 0, height: 0})
+             |> elem(1)
+             |> Map.put(:frame_size, 3)
+             |> Map.put(:queue, "12")
+
     assert {{:ok, actions}, state} =
-             Parser.handle_process(:input, %Buffer{payload: "345"}, nil, %{
-               frame_size: 3,
-               queue: "12",
-               timestamp: 0,
-               caps: %{
-                 framerate: {0, 1}
-               }
-             })
+             Parser.handle_process(:input, %Buffer{payload: "345"}, nil, parser_state)
 
     assert [buffer: {:output, bufs}] = actions
     assert bufs == [%Buffer{payload: "123", metadata: %{pts: 0}}]
@@ -64,15 +63,18 @@ defmodule Membrane.Element.RawVideo.ParserTest do
   end
 
   test "Parser add correct timestamps" do
-    assert {{:ok, actions}, state} =
-             Parser.handle_process(:input, %Buffer{payload: "123456"}, nil, %{
-               frame_size: 2,
-               queue: <<>>,
-               timestamp: 0,
-               caps: %{
-                 framerate: {@framerate, 1}
-               }
+    assert parser_state =
+             Parser.handle_init(%Parser{
+               format: :I420,
+               width: 0,
+               height: 0,
+               framerate: {@framerate, 1}
              })
+             |> elem(1)
+             |> Map.put(:frame_size, 2)
+
+    assert {{:ok, actions}, state} =
+             Parser.handle_process(:input, %Buffer{payload: "123456"}, nil, parser_state)
 
     assert [buffer: {:output, bufs}] = actions
 

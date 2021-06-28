@@ -54,7 +54,17 @@ defmodule Membrane.Element.RawVideo.Parser do
         aligned: true
       }
 
-      {:ok, %{caps: caps, timestamp: 0, frame_size: frame_size, queue: <<>>}}
+      {num, denom} = caps.framerate
+      frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
+
+      {:ok,
+       %{
+         caps: caps,
+         timestamp: 0,
+         frame_duration: frame_duration,
+         frame_size: frame_size,
+         queue: <<>>
+       }}
     end
   end
 
@@ -73,13 +83,16 @@ defmodule Membrane.Element.RawVideo.Parser do
   end
 
   @impl true
-  def handle_caps(:input, _caps, _ctx, state) do
+  def handle_caps(:input, caps, _ctx, state) do
     # Do not forward caps
-    {:ok, state}
+    {num, denom} = caps.framerate
+    frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
+
+    {:ok, %{state | frame_duration: frame_duration}}
   end
 
   @impl true
-  def handle_process(:input, %Buffer{payload: raw_payload}, _ctx, state) do
+  def handle_process(:input, %Buffer{metadata: metadata, payload: raw_payload}, _ctx, state) do
     %{frame_size: frame_size} = state
     payload = state.queue <> Payload.to_binary(raw_payload)
     size = byte_size(payload)
@@ -87,6 +100,9 @@ defmodule Membrane.Element.RawVideo.Parser do
     if size < frame_size do
       {:ok, %{state | queue: payload}}
     else
+      if Map.has_key?(metadata, :timestamps),
+        do: raise("Buffer shouldn't contain timestamp in the metadata.")
+
       {bufs, tail} = split_into_buffers(payload, frame_size)
 
       {bufs, state} =
@@ -109,8 +125,8 @@ defmodule Membrane.Element.RawVideo.Parser do
 
   defp bump_timestamp(state) do
     use Ratio
-    %{timestamp: timestamp, caps: %{framerate: {num, denom}}} = state
-    timestamp = timestamp + Ratio.new(denom * Membrane.Time.second(), num)
+    %{timestamp: timestamp, frame_duration: frame_duration} = state
+    timestamp = timestamp + frame_duration
     %{state | timestamp: timestamp}
   end
 
