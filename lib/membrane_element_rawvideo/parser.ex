@@ -100,7 +100,7 @@ defmodule Membrane.Element.RawVideo.Parser do
     if size < frame_size do
       {:ok, %{state | queue: payload}}
     else
-      if Map.has_key?(metadata, :timestamps),
+      if Map.has_key?(metadata, :timestamp),
         do: raise("Buffer shouldn't contain timestamp in the metadata.")
 
       {bufs, tail} = split_into_buffers(payload, frame_size)
