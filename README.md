@@ -13,7 +13,7 @@ Documentation is available at [HexDocs](https://hexdocs.pm/membrane_element_rawv
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_element_rawvideo_parser, "~> 0.2.0"}
+{:membrane_element_rawvideo_parser, "~> 0.5.0"}
 ```
 
 ## Copyright and License
