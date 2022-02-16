@@ -1,19 +1,19 @@
-defmodule Membrane.Element.RawVideo.Parser.MixProject do
+defmodule Membrane.RawVideo.Parser.MixProject do
   use Mix.Project
 
-  @version "0.5.0"
-  @github_url "https://github.com/membraneframework/membrane-element-rawvideo-parser"
+  @version "0.6.0"
+  @github_url "https://github.com/membraneframework/membrane_raw_video_parser_plugin"
 
   def project do
     [
-      app: :membrane_element_rawvideo_parser,
+      app: :membrane_raw_video_parser_plugin,
       version: @version,
-      elixir: "~> 1.7",
+      elixir: "~> 1.12",
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
-      description: "Membrane Multimedia Framework (Raw video parser)",
+      description: "Raw video parser plugin for Membrane Multimedia Framework",
       package: package(),
-      name: "Membrane Element: Raw video parser",
+      name: "Membrane raw video parser",
       source_url: @github_url,
       docs: docs(),
       homepage_url: "https://membraneframework.org",
@@ -33,7 +33,8 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
   defp docs do
     [
       main: "readme",
-      extras: ["README.md"],
+      extras: ["README.md", LICENSE: [title: "License"]],
+      formatters: ["html"],
       source_ref: "v#{@version}"
     ]
   end
@@ -41,7 +42,7 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
   defp package do
     [
       maintainers: ["Membrane Team"],
-      licenses: ["Apache 2.0"],
+      licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @github_url,
         "Membrane Framework Homepage" => "https://membraneframework.org"
@@ -51,8 +52,12 @@ defmodule Membrane.Element.RawVideo.Parser.MixProject do
 
   defp deps do
     [
-      {:ex_doc, "~> 0.21", only: :dev, runtime: false},
-      {:membrane_core, "~> 0.8.0"},
+      {:ex_doc, "~> 0.28", only: :dev, runtime: false},
+      {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
+      {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:membrane_file_plugin, "~> 0.9", only: :test},
+      {:bunch, "~> 1.3"},
+      {:membrane_core, "~> 0.9.0"},
       {:membrane_caps_video_raw, "~> 0.1.0"}
     ]
   end
