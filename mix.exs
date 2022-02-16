@@ -55,6 +55,7 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       {:ex_doc, "~> 0.28", only: :dev, runtime: false},
       {:dialyxir, "~> 1.1", only: [:dev, :test], runtime: false},
       {:credo, "~> 1.6", only: [:dev, :test], runtime: false},
+      {:membrane_file_plugin, "~> 0.1", only: :test},
       {:bunch, "~> 1.3"},
       {:membrane_core, "~> 0.9.0"},
       {:membrane_caps_video_raw, "~> 0.1.0"}

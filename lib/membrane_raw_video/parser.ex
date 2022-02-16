@@ -43,30 +43,46 @@ defmodule Membrane.RawVideo.Parser do
                 """
               ]
 
+  @supported_formats [:I420, :I422, :I444, :RGB, :BGRA, :RGBA, :NV12, :NV21, :YV12, :AYUV]
+
   @impl true
   def handle_init(opts) do
-    with {:ok, frame_size} <- Raw.frame_size(opts.format, opts.width, opts.height) do
-      caps = %Raw{
-        format: opts.format,
-        width: opts.width,
-        height: opts.height,
-        framerate: opts.framerate,
-        aligned: true
-      }
-
-      {num, denom} = caps.framerate
-      frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
-
-      {:ok,
-       %{
-         caps: caps,
-         timestamp: 0,
-         frame_duration: frame_duration,
-         frame_size: frame_size,
-         queue: [],
-         queue_size: 0
-       }}
+    unless opts.format in @supported_formats do
+      raise """
+      Unsupported frame format: #{inspect(opts.format)}
+      The elements supports: #{Enum.map_join(@supported_formats, ", ", &inspect/1)}
+      """
     end
+
+    frame_size =
+      case Raw.frame_size(opts.format, opts.width, opts.height) do
+        {:ok, frame_size} ->
+          frame_size
+
+        {:error, :invalid_dims} ->
+          raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.format)} format"
+      end
+
+    caps = %Raw{
+      format: opts.format,
+      width: opts.width,
+      height: opts.height,
+      framerate: opts.framerate,
+      aligned: true
+    }
+
+    {num, denom} = caps.framerate
+    frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
+
+    {:ok,
+     %{
+       caps: caps,
+       timestamp: 0,
+       frame_duration: frame_duration,
+       frame_size: frame_size,
+       queue: [],
+       queue_size: 0
+     }}
   end
 
   @impl true
