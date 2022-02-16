@@ -2,6 +2,15 @@
 
 [![CircleCI](https://circleci.com/gh/membraneframework/membrane-element-rawvideo-parser.svg?style=svg)](https://circleci.com/gh/membraneframework/membrane-element-rawvideo-parser)
 
+# THIS PACKAGE HAS BEEN RENAMED TO [membrane_raw_video_parser_plugin](https://hex.pm/packages/membrane_raw_video_parser_plugin)
+
+**PLEASE CHANGE YOUR DEPENDENCY NAME:**
+
+```elixir
+{:membrane_raw_video_parser_plugin, "~> 0.6.0"}
+```
+
+---------
 
 This package provides [Membrane Multimedia Framework](https://membraneframework.org)
 element that can be used to parse data stream into raw video frames.
