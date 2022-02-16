@@ -80,8 +80,7 @@ defmodule Membrane.RawVideo.Parser do
        timestamp: 0,
        frame_duration: frame_duration,
        frame_size: frame_size,
-       queue: [],
-       queue_size: 0
+       queue: []
      }}
   end
 

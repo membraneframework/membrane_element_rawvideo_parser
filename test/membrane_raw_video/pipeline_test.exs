@@ -1,6 +1,7 @@
 defmodule Membrane.RawVideo.ParserPipelineTest do
   use ExUnit.Case, async: true
 
+  import Membrane.ParentSpec
   import Membrane.Testing.Assertions
 
   alias Membrane.RawVideo.Parser
@@ -20,19 +21,26 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
     File.write!(fixture_path, black_frames)
     on_exit(fn -> File.rm!(fixture_path) end)
 
-    assert {:ok, pipeline} =
-             Testing.Pipeline.start_link(%Testing.Pipeline.Options{
-               elements: [
-                 file_src: %Membrane.File.Source{chunk_size: chunk_size, location: fixture_path},
-                 parser: %Parser{
-                   format: :RGB,
-                   width: @width,
-                   height: @height,
-                   framerate: {@fps, 1}
-                 },
-                 sink: Testing.Sink
-               ]
-             })
+    pipeline_opts = %Testing.Pipeline.Options{
+      elements: [
+        file_src: %Membrane.File.Source{location: fixture_path},
+        parser: %Parser{
+          format: :RGB,
+          width: @width,
+          height: @height,
+          framerate: {@fps, 1}
+        },
+        sink: Testing.Sink
+      ],
+      links: [
+        link(:file_src)
+        |> via_in(:input, auto_demand_size: chunk_size)
+        |> to(:parser)
+        |> to(:sink)
+      ]
+    }
+
+    assert {:ok, pipeline} = Testing.Pipeline.start_link(pipeline_opts)
 
     assert :ok = Testing.Pipeline.play(pipeline)
     assert_start_of_stream(pipeline, :sink)
@@ -50,7 +58,7 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
   @moduletag :tmp_dir
 
   test "with small chunks from source", %{tmp_dir: dir} do
-    pipeline_test(1024, dir)
+    pipeline_test(10, dir)
   end
 
   test "with huge chunks from source", %{tmp_dir: dir} do
