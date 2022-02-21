@@ -36,7 +36,7 @@ defmodule Membrane.RawVideo.Parser do
               ],
               framerate: [
                 type: :tuple,
-                spec: Raw.framerate_t(),
+                spec: RawVideo.framerate_t(),
                 default: {0, 1},
                 description: """
                 Framerate of video stream. Passed forward in caps.
@@ -47,9 +47,9 @@ defmodule Membrane.RawVideo.Parser do
 
   @impl true
   def handle_init(opts) do
-    unless opts.format in @supported_formats do
+    unless opts.pixel_format in @supported_formats do
       raise """
-      Unsupported frame format: #{inspect(opts.format)}
+      Unsupported frame pixel format: #{inspect(opts.pixel_format)}
       The elements supports: #{Enum.map_join(@supported_formats, ", ", &inspect/1)}
       """
     end
@@ -59,12 +59,12 @@ defmodule Membrane.RawVideo.Parser do
         {:ok, frame_size} ->
           frame_size
 
-        {:error, :invalid_dims} ->
+        {:error, :invalid_dimensions} ->
           raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.pixel_format)} pixel format"
       end
 
     caps = %RawVideo{
-      format: opts.pixel_format,
+      pixel_format: opts.pixel_format,
       width: opts.width,
       height: opts.height,
       framerate: opts.framerate,

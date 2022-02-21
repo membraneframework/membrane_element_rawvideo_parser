@@ -49,7 +49,7 @@ defmodule Membrane.RawVideo.ParserTest do
 
   test "Process buffer with part of frame queued" do
     assert parser_state =
-             Parser.handle_init(%Parser{format: :I420, width: 0, height: 0})
+             Parser.handle_init(%Parser{pixel_format: :I420, width: 0, height: 0})
              |> elem(1)
              |> Map.put(:frame_size, 3)
              |> Map.put(:queue, ["12"])
@@ -65,7 +65,7 @@ defmodule Membrane.RawVideo.ParserTest do
   test "Parser add correct timestamps" do
     assert parser_state =
              Parser.handle_init(%Parser{
-               format: :I420,
+               pixel_format: :I420,
                width: 0,
                height: 0,
                framerate: {@framerate, 1}
