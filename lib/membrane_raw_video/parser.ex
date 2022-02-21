@@ -9,15 +9,15 @@ defmodule Membrane.RawVideo.Parser do
   """
   use Membrane.Filter
   alias Membrane.{Buffer, Payload}
-  alias Membrane.Caps.Video.Raw
+  alias Membrane.RawVideo
 
   def_input_pad :input, demand_unit: :bytes, demand_mode: :auto, caps: :any
 
-  def_output_pad :output, demand_mode: :auto, caps: {Raw, aligned: true}
+  def_output_pad :output, demand_mode: :auto, caps: {RawVideo, aligned: true}
 
-  def_options format: [
+  def_options pixel_format: [
                 type: :atom,
-                spec: Raw.format_t(),
+                spec: RawVideo.pixel_format_t(),
                 description: """
                 Format used to encode pixels of the video frame.
                 """
@@ -55,16 +55,16 @@ defmodule Membrane.RawVideo.Parser do
     end
 
     frame_size =
-      case Raw.frame_size(opts.format, opts.width, opts.height) do
+      case RawVideo.frame_size(opts.pixel_format, opts.width, opts.height) do
         {:ok, frame_size} ->
           frame_size
 
         {:error, :invalid_dims} ->
-          raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.format)} format"
+          raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.pixel_format)} pixel format"
       end
 
-    caps = %Raw{
-      format: opts.format,
+    caps = %RawVideo{
+      format: opts.pixel_format,
       width: opts.width,
       height: opts.height,
       framerate: opts.framerate,
