@@ -62,7 +62,7 @@ defmodule Membrane.RawVideo.ParserTest do
     assert IO.iodata_to_binary(state.queue) == "45"
   end
 
-  test "Parser add correct timestamps" do
+  test "Parser adds correct timestamps" do
     assert parser_state =
              Parser.handle_init(%Parser{
                pixel_format: :I420,

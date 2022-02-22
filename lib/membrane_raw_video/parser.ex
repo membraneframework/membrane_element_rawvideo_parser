@@ -9,9 +9,9 @@ defmodule Membrane.RawVideo.Parser do
   """
   use Membrane.Filter
   alias Membrane.{Buffer, Payload}
-  alias Membrane.RawVideo
+  alias Membrane.{RawVideo, RemoteStream}
 
-  def_input_pad :input, demand_unit: :bytes, demand_mode: :auto, caps: :any
+  def_input_pad :input, demand_unit: :bytes, demand_mode: :auto, caps: RemoteStream
 
   def_output_pad :output, demand_mode: :auto, caps: {RawVideo, aligned: true}
 
@@ -90,12 +90,9 @@ defmodule Membrane.RawVideo.Parser do
   end
 
   @impl true
-  def handle_caps(:input, caps, _ctx, state) do
+  def handle_caps(:input, _caps, _ctx, state) do
     # Do not forward caps
-    {num, denom} = caps.framerate
-    frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
-
-    {:ok, %{state | frame_duration: frame_duration}}
+    {:ok, state}
   end
 
   @impl true
