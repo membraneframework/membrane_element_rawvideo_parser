@@ -9,15 +9,15 @@ defmodule Membrane.RawVideo.Parser do
   """
   use Membrane.Filter
   alias Membrane.{Buffer, Payload}
-  alias Membrane.Caps.Video.Raw
+  alias Membrane.{RawVideo, RemoteStream}
 
-  def_input_pad :input, demand_unit: :bytes, demand_mode: :auto, caps: :any
+  def_input_pad :input, demand_unit: :bytes, demand_mode: :auto, caps: RemoteStream
 
-  def_output_pad :output, demand_mode: :auto, caps: {Raw, aligned: true}
+  def_output_pad :output, demand_mode: :auto, caps: {RawVideo, aligned: true}
 
-  def_options format: [
+  def_options pixel_format: [
                 type: :atom,
-                spec: Raw.format_t(),
+                spec: RawVideo.pixel_format_t(),
                 description: """
                 Format used to encode pixels of the video frame.
                 """
@@ -36,7 +36,7 @@ defmodule Membrane.RawVideo.Parser do
               ],
               framerate: [
                 type: :tuple,
-                spec: Raw.framerate_t(),
+                spec: RawVideo.framerate_t(),
                 default: {0, 1},
                 description: """
                 Framerate of video stream. Passed forward in caps.
@@ -47,24 +47,24 @@ defmodule Membrane.RawVideo.Parser do
 
   @impl true
   def handle_init(opts) do
-    unless opts.format in @supported_formats do
+    unless opts.pixel_format in @supported_formats do
       raise """
-      Unsupported frame format: #{inspect(opts.format)}
+      Unsupported frame pixel format: #{inspect(opts.pixel_format)}
       The elements supports: #{Enum.map_join(@supported_formats, ", ", &inspect/1)}
       """
     end
 
     frame_size =
-      case Raw.frame_size(opts.format, opts.width, opts.height) do
+      case RawVideo.frame_size(opts.pixel_format, opts.width, opts.height) do
         {:ok, frame_size} ->
           frame_size
 
-        {:error, :invalid_dims} ->
-          raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.format)} format"
+        {:error, :invalid_dimensions} ->
+          raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.pixel_format)} pixel format"
       end
 
-    caps = %Raw{
-      format: opts.format,
+    caps = %RawVideo{
+      pixel_format: opts.pixel_format,
       width: opts.width,
       height: opts.height,
       framerate: opts.framerate,
@@ -90,12 +90,9 @@ defmodule Membrane.RawVideo.Parser do
   end
 
   @impl true
-  def handle_caps(:input, caps, _ctx, state) do
+  def handle_caps(:input, _caps, _ctx, state) do
     # Do not forward caps
-    {num, denom} = caps.framerate
-    frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
-
-    {:ok, %{state | frame_duration: frame_duration}}
+    {:ok, state}
   end
 
   @impl true

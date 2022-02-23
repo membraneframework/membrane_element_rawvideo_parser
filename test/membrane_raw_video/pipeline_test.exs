@@ -25,7 +25,7 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
       elements: [
         file_src: %Membrane.File.Source{location: fixture_path},
         parser: %Parser{
-          format: :RGB,
+          pixel_format: :RGB,
           width: @width,
           height: @height,
           framerate: {@fps, 1}

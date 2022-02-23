@@ -14,7 +14,7 @@ It is part of [Membrane Multimedia Framework](https://membraneframework.org).
 Add the following line to your `deps` in `mix.exs`. Run `mix deps.get`.
 
 ```elixir
-{:membrane_raw_video_parser_plugin, "~> 0.6.0"}
+{:membrane_raw_video_parser_plugin, "~> 0.7.0"}
 ```
 
 ## Copyright and License
