@@ -23,13 +23,13 @@ defmodule Membrane.RawVideo.Parser do
                 """
               ],
               width: [
-                type: :int,
+                spec: pos_integer(),
                 description: """
                 Width of a frame in pixels.
                 """
               ],
               height: [
-                type: :int,
+                spec: pos_integer(),
                 description: """
                 Height of a frame in pixels.
                 """
