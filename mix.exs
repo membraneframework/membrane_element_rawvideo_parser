@@ -1,7 +1,7 @@
 defmodule Membrane.RawVideo.Parser.MixProject do
   use Mix.Project
 
-  @version "0.7.0"
+  @version "0.8.0"
   @github_url "https://github.com/membraneframework/membrane_raw_video_parser_plugin"
 
   def project do
@@ -57,7 +57,7 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       {:credo, "~> 1.6", only: :dev, runtime: false},
       {:membrane_file_plugin, "~> 0.9", only: :test},
       {:bunch, "~> 1.3"},
-      {:membrane_core, "~> 0.9.0"},
+      {:membrane_core, "~> 0.10.0"},
       {:membrane_raw_video_format, "~> 0.2.0"}
     ]
   end
