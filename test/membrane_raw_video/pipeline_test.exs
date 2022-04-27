@@ -42,7 +42,6 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
 
     assert {:ok, pipeline} = Testing.Pipeline.start_link(pipeline_opts)
 
-    assert :ok = Testing.Pipeline.play(pipeline)
     assert_start_of_stream(pipeline, :sink)
 
     for i <- 0..(num_frames - 1) do
@@ -52,7 +51,7 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
     end
 
     assert_end_of_stream(pipeline, :sink)
-    Testing.Pipeline.stop_and_terminate(pipeline, blocking?: true)
+    Testing.Pipeline.terminate(pipeline, blocking?: true)
   end
 
   @moduletag :tmp_dir
