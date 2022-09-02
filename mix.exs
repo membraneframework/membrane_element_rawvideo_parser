@@ -42,7 +42,6 @@ defmodule Membrane.RawVideo.Parser.MixProject do
 
   defp dialyzer() do
     opts = [
-      plt_local_path: "priv/plts",
       flags: [:error_handling]
     ]
 

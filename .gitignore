@@ -2,7 +2,6 @@ tmp
 compile_commands.json
 .elixir_ls
 .gdb_history
-priv/
 
 # Created by https://www.gitignore.io/api/c,vim,linux,macos,elixir,windows,visualstudiocode
 
