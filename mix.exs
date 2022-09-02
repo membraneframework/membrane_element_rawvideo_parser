@@ -16,7 +16,7 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       name: "Membrane raw video parser",
       source_url: @github_url,
       docs: docs(),
-      homepage_url: "https://membraneframework.org",
+      homepage_url: "https://membrane.stream/",
       deps: deps()
     ]
   end
@@ -45,7 +45,7 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       licenses: ["Apache-2.0"],
       links: %{
         "GitHub" => @github_url,
-        "Membrane Framework Homepage" => "https://membraneframework.org"
+        "Membrane Framework Homepage" => "https://membrane.stream/"
       }
     ]
   end
