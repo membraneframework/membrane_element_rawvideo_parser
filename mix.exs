@@ -12,6 +12,7 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       elixirc_paths: elixirc_paths(Mix.env()),
       start_permanent: Mix.env() == :prod,
       description: "Raw video parser plugin for Membrane Multimedia Framework",
+      dialyzer: dialyzer(),
       package: package(),
       name: "Membrane raw video parser",
       source_url: @github_url,
@@ -37,6 +38,19 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       formatters: ["html"],
       source_ref: "v#{@version}"
     ]
+  end
+
+  defp dialyzer() do
+    opts = [
+      plt_local_path: "priv/plts",
+      flags: [:error_handling]
+    ]
+
+    if System.get_env("CI") == "true" do
+      [plt_core_path: "priv/plts"] ++ opts
+    else
+      opts
+    end
   end
 
   defp package do
