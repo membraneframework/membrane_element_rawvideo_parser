@@ -22,7 +22,7 @@ Membrane SDL plugin.
 
 ```elixir
 defmodule Membrane.RawVideo.Parser.Pipeline do
-  
+
   use Membrane.Pipeline
 
   @doc """
@@ -37,22 +37,32 @@ defmodule Membrane.RawVideo.Parser.Pipeline do
       framerate: options.caps.framerate,
       width: options.caps.width,
       height: options.caps.height,
-      pixel_format: caps.pixel_format
-    },
+      pixel_format: options.caps.pixel_format
+    }
 
-    children = [
+    children = %{
       file_src: %Membrane.File.Source{location: options.video_path},
       parser: parser,
       sdl: Membrane.SDL.Player
-    ],
-    
+    }
+
     links = [
       link(:file_src)
       |> to(:parser)
       |> to(:sdl)
     ]
-    
-    {{:ok, spec: %ParentSpec{children: children, links: links}}, %{}}
+
+    {{:ok, spec: %ParentSpec{children: children, links: links}, playback: :playing}, %{}}
+  end
+
+  @impl true
+  def handle_element_end_of_stream({:sdl, _}, _context, state) do
+    {{:ok, [playback: :terminating]}, state}
+  end
+
+  @impl true
+  def handle_element_end_of_stream({_pad, _src}, _context, state) do
+    {:ok, state}
   end
 end
 ```
