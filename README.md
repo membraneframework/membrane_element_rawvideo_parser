@@ -32,7 +32,7 @@ defmodule Membrane.RawVideo.Parser.Pipeline do
   })
   """
   @impl true
-  def handle_init(_context, options) do
+  def handle_init(_ctx, options) do
     parser = %Membrane.RawVideo.Parser{
       framerate: options.caps.framerate,
       width: options.caps.width,
@@ -50,12 +50,12 @@ defmodule Membrane.RawVideo.Parser.Pipeline do
   end
 
   @impl true
-  def handle_element_end_of_stream(:sdl, _pad_ref, _context, state) do
+  def handle_element_end_of_stream(:sdl, _pad_ref, _ctx, state) do
     {[playback: :terminating], state}
   end
 
   @impl true
-  def handle_element_end_of_stream(_src, _pad_ref, _context, state) do
+  def handle_element_end_of_stream(_src, _pad_ref, _ctx, state) do
     {[], state}
   end
 end
