@@ -1,7 +1,7 @@
 defmodule Membrane.RawVideo.ParserPipelineTest do
   use ExUnit.Case, async: true
 
-  import Membrane.ParentSpec
+  import Membrane.ChildrenSpec
   import Membrane.Testing.Assertions
 
   alias Membrane.RawVideo.Parser
@@ -21,26 +21,20 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
     File.write!(fixture_path, black_frames)
     on_exit(fn -> File.rm!(fixture_path) end)
 
-    pipeline_opts = %Testing.Pipeline.Options{
-      elements: [
-        file_src: %Membrane.File.Source{location: fixture_path},
-        parser: %Parser{
+    pipeline_opts = [
+      structure: [
+        child(:file_src, %Membrane.File.Source{location: fixture_path})
+        |> child(:parser, %Parser{
           pixel_format: :RGB,
           width: @width,
           height: @height,
           framerate: {@fps, 1}
-        },
-        sink: Testing.Sink
-      ],
-      links: [
-        link(:file_src)
-        |> via_in(:input, auto_demand_size: chunk_size)
-        |> to(:parser)
-        |> to(:sink)
+        })
+        |> child(:sink, Testing.Sink)
       ]
-    }
+    ]
 
-    assert {:ok, pipeline} = Testing.Pipeline.start_link(pipeline_opts)
+    pipeline = Testing.Pipeline.start_link_supervised!(pipeline_opts)
 
     assert_start_of_stream(pipeline, :sink)
 
@@ -51,7 +45,6 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
     end
 
     assert_end_of_stream(pipeline, :sink)
-    Testing.Pipeline.terminate(pipeline, blocking?: true)
   end
 
   @moduletag :tmp_dir
