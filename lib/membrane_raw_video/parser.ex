@@ -3,7 +3,7 @@ defmodule Membrane.RawVideo.Parser do
   Simple module responsible for splitting the incoming buffers into
   frames of raw (uncompressed) video frames of desired format.
 
-  The parser sends proper caps when moves to playing state.
+  The parser sends proper stream_format when moves to playing state.
   No data analysis is done, this element simply ensures that
   the resulting packets have proper size.
   """
@@ -11,12 +11,16 @@ defmodule Membrane.RawVideo.Parser do
   alias Membrane.{Buffer, Payload}
   alias Membrane.{RawVideo, RemoteStream}
 
-  def_input_pad :input, demand_unit: :bytes, demand_mode: :auto, caps: RemoteStream
+  def_input_pad :input,
+    demand_unit: :bytes,
+    demand_mode: :auto,
+    accepted_format: RemoteStream
 
-  def_output_pad :output, demand_mode: :auto, caps: {RawVideo, aligned: true}
+  def_output_pad :output,
+    demand_mode: :auto,
+    accepted_format: %RawVideo{aligned: true}
 
   def_options pixel_format: [
-                type: :atom,
                 spec: RawVideo.pixel_format_t(),
                 description: """
                 Format used to encode pixels of the video frame.
@@ -35,18 +39,17 @@ defmodule Membrane.RawVideo.Parser do
                 """
               ],
               framerate: [
-                type: :tuple,
                 spec: RawVideo.framerate_t(),
                 default: {0, 1},
                 description: """
-                Framerate of video stream. Passed forward in caps.
+                Framerate of video stream. Passed forward in stream_format.
                 """
               ]
 
   @supported_formats [:I420, :I422, :I444, :RGB, :BGRA, :RGBA, :NV12, :NV21, :YV12, :AYUV]
 
   @impl true
-  def handle_init(opts) do
+  def handle_init(_ctx, opts) do
     unless opts.pixel_format in @supported_formats do
       raise """
       Unsupported frame pixel format: #{inspect(opts.pixel_format)}
@@ -63,7 +66,7 @@ defmodule Membrane.RawVideo.Parser do
           raise "Provided dimensions (#{opts.width}x#{opts.height}) are invalid for #{inspect(opts.pixel_format)} pixel format"
       end
 
-    caps = %RawVideo{
+    stream_format = %RawVideo{
       pixel_format: opts.pixel_format,
       width: opts.width,
       height: opts.height,
@@ -71,12 +74,12 @@ defmodule Membrane.RawVideo.Parser do
       aligned: true
     }
 
-    {num, denom} = caps.framerate
+    {num, denom} = stream_format.framerate
     frame_duration = if num == 0, do: 0, else: Ratio.new(denom * Membrane.Time.second(), num)
 
-    {:ok,
+    {[],
      %{
-       caps: caps,
+       stream_format: stream_format,
        timestamp: 0,
        frame_duration: frame_duration,
        frame_size: frame_size,
@@ -85,14 +88,14 @@ defmodule Membrane.RawVideo.Parser do
   end
 
   @impl true
-  def handle_prepared_to_playing(_ctx, state) do
-    {{:ok, caps: {:output, state.caps}}, state}
+  def handle_playing(_ctx, state) do
+    {[stream_format: {:output, state.stream_format}], state}
   end
 
   @impl true
-  def handle_caps(:input, _caps, _ctx, state) do
-    # Do not forward caps
-    {:ok, state}
+  def handle_stream_format(:input, _stream_format, _ctx, state) do
+    # Do not forward stream_format
+    {[], state}
   end
 
   @impl true
@@ -106,7 +109,7 @@ defmodule Membrane.RawVideo.Parser do
     size = IO.iodata_length(queue)
 
     if size < frame_size do
-      {:ok, %{state | queue: queue}}
+      {[], %{state | queue: queue}}
     else
       data_binary = queue |> Enum.reverse() |> IO.iodata_to_binary()
 
@@ -119,16 +122,11 @@ defmodule Membrane.RawVideo.Parser do
           {%Buffer{payload: payload, pts: timestamp}, bump_timestamp(state_acc)}
         end)
 
-      {{:ok, buffer: {:output, bufs}}, %{state | queue: [tail]}}
+      {[buffer: {:output, bufs}], %{state | queue: [tail]}}
     end
   end
 
-  @impl true
-  def handle_prepared_to_stopped(_ctx, state) do
-    {:ok, %{state | queue: []}}
-  end
-
-  defp bump_timestamp(%{caps: %{framerate: {0, _}}} = state) do
+  defp bump_timestamp(%{stream_format: %{framerate: {0, _}}} = state) do
     state
   end
 
