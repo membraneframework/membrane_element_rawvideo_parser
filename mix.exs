@@ -71,7 +71,7 @@ defmodule Membrane.RawVideo.Parser.MixProject do
       {:membrane_core, "~> 0.11.0"},
       {:bunch, "~> 1.3"},
       {:membrane_file_plugin, "~> 0.13.0"},
-      {:membrane_raw_video_format, "~> 0.2.0"}
+      {:membrane_raw_video_format, "~> 0.3.0"}
     ]
   end
 end
