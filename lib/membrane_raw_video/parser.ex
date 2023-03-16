@@ -46,7 +46,7 @@ defmodule Membrane.RawVideo.Parser do
                 """
               ]
 
-  @supported_formats [:I420, :I422, :I444, :RGB, :BGRA, :RGBA, :NV12, :NV21, :YV12, :AYUV]
+  @supported_formats [:I420, :I422, :I444, :RGB, :BGRA, :RGBA, :NV12, :NV21, :YV12, :AYUV, :YUY2]
 
   @impl true
   def handle_init(_ctx, opts) do
