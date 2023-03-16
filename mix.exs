@@ -1,7 +1,7 @@
 defmodule Membrane.RawVideo.Parser.MixProject do
   use Mix.Project
 
-  @version "0.9.0"
+  @version "0.10.0"
   @github_url "https://github.com/membraneframework/membrane_raw_video_parser_plugin"
 
   def project do
