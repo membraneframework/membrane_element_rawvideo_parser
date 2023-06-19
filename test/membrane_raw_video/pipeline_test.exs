@@ -13,7 +13,7 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
   @frame_bits @width * @height * @rgb_bpp
   @fps 24
 
-  defp pipeline_test(chunk_size, dir) do
+  defp pipeline_test(_chunk_size, dir) do
     num_frames = 30
     size = num_frames * @frame_bits
     black_frames = <<0::size(size)>>
