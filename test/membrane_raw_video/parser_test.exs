@@ -6,7 +6,7 @@ defmodule Membrane.RawVideo.ParserTest do
   @framerate 30
   test "Process buffer with 3 frames" do
     assert {actions, _state} =
-             Parser.handle_process_list(:input, [%Buffer{payload: "123456"}], nil, %{
+             Parser.handle_buffer(:input, %Buffer{payload: "123456"}, nil, %{
                frame_size: 2,
                queue: [],
                timestamp: 0,
@@ -23,7 +23,7 @@ defmodule Membrane.RawVideo.ParserTest do
 
   test "Process buffer with 2 and a half frames" do
     assert {actions, state} =
-             Parser.handle_process_list(:input, [%Buffer{payload: "12345"}], nil, %{
+             Parser.handle_buffer(:input, %Buffer{payload: "12345"}, nil, %{
                frame_size: 2,
                queue: [],
                timestamp: 0,
@@ -39,7 +39,7 @@ defmodule Membrane.RawVideo.ParserTest do
 
   test "Process buffer without full frame" do
     assert {[], state} =
-             Parser.handle_process_list(:input, [%Buffer{payload: "12345"}], nil, %{
+             Parser.handle_buffer(:input, %Buffer{payload: "12345"}, nil, %{
                frame_size: 6,
                queue: []
              })
@@ -55,7 +55,7 @@ defmodule Membrane.RawVideo.ParserTest do
              |> Map.put(:queue, ["12"])
 
     assert {actions, state} =
-             Parser.handle_process_list(:input, [%Buffer{payload: "345"}], nil, parser_state)
+             Parser.handle_buffer(:input, %Buffer{payload: "345"}, nil, parser_state)
 
     assert [buffer: {:output, bufs}] = actions
     assert bufs == [%Buffer{payload: "123", pts: 0}]
@@ -74,7 +74,7 @@ defmodule Membrane.RawVideo.ParserTest do
              |> Map.put(:frame_size, 2)
 
     assert {actions, _state} =
-             Parser.handle_process_list(:input, [%Buffer{payload: "123456"}], nil, parser_state)
+             Parser.handle_buffer(:input, %Buffer{payload: "123456"}, nil, parser_state)
 
     assert [buffer: {:output, bufs}] = actions
 
