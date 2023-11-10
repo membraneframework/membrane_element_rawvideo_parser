@@ -11,14 +11,9 @@ defmodule Membrane.RawVideo.Parser do
   alias Membrane.{Buffer, Payload}
   alias Membrane.{RawVideo, RemoteStream}
 
-  def_input_pad :input,
-    demand_unit: :bytes,
-    demand_mode: :auto,
-    accepted_format: RemoteStream
+  def_input_pad :input, accepted_format: RemoteStream
 
-  def_output_pad :output,
-    demand_mode: :auto,
-    accepted_format: %RawVideo{aligned: true}
+  def_output_pad :output, accepted_format: %RawVideo{aligned: true}
 
   def_options pixel_format: [
                 spec: RawVideo.pixel_format_t(),
@@ -80,7 +75,7 @@ defmodule Membrane.RawVideo.Parser do
     {[],
      %{
        stream_format: stream_format,
-       timestamp: 0,
+       timestamp: Ratio.new(0),
        frame_duration: frame_duration,
        frame_size: frame_size,
        queue: []
@@ -99,13 +94,12 @@ defmodule Membrane.RawVideo.Parser do
   end
 
   @impl true
-  def handle_process_list(:input, buffers, _ctx, state) do
+  def handle_buffer(:input, buffer, _ctx, state) do
     %{frame_size: frame_size} = state
 
-    payload_iodata =
-      buffers |> Enum.map(fn %Buffer{payload: payload} -> Payload.to_binary(payload) end)
+    payload = Payload.to_binary(buffer.payload)
 
-    queue = [payload_iodata | state.queue]
+    queue = [payload | state.queue]
     size = IO.iodata_length(queue)
 
     if size < frame_size do
@@ -131,9 +125,8 @@ defmodule Membrane.RawVideo.Parser do
   end
 
   defp bump_timestamp(state) do
-    use Ratio
     %{timestamp: timestamp, frame_duration: frame_duration} = state
-    timestamp = timestamp + frame_duration
+    timestamp = Ratio.add(timestamp, frame_duration)
     %{state | timestamp: timestamp}
   end
 end

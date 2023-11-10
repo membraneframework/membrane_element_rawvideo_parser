@@ -22,7 +22,7 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
     on_exit(fn -> File.rm!(fixture_path) end)
 
     pipeline_opts = [
-      structure: [
+      spec: [
         child(:file_src, %Membrane.File.Source{location: fixture_path})
         |> child(:parser, %Parser{
           pixel_format: :RGB,
@@ -41,7 +41,12 @@ defmodule Membrane.RawVideo.ParserPipelineTest do
     for i <- 0..(num_frames - 1) do
       assert_sink_buffer(pipeline, :sink, %Buffer{pts: pts, payload: payload})
       assert bit_size(payload) == @frame_bits
-      assert pts == i |> Ratio.*(Ratio.new(Membrane.Time.second(), @fps)) |> Ratio.floor()
+
+      assert pts ==
+               i
+               |> Ratio.new()
+               |> Ratio.mult(Ratio.new(Membrane.Time.second(), @fps))
+               |> Ratio.floor()
     end
 
     assert_end_of_stream(pipeline, :sink)
