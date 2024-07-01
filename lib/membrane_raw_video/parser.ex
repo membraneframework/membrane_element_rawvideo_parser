@@ -16,7 +16,7 @@ defmodule Membrane.RawVideo.Parser do
   def_output_pad :output, accepted_format: %RawVideo{aligned: true}
 
   def_options pixel_format: [
-                spec: RawVideo.pixel_format_t(),
+                spec: RawVideo.pixel_format(),
                 description: """
                 Format used to encode pixels of the video frame.
                 """
@@ -34,7 +34,7 @@ defmodule Membrane.RawVideo.Parser do
                 """
               ],
               framerate: [
-                spec: RawVideo.framerate_t(),
+                spec: RawVideo.framerate(),
                 default: {0, 1},
                 description: """
                 Framerate of video stream. Passed forward in stream_format.
